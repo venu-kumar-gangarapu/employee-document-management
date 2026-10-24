@@ -1,0 +1,222 @@
+<section class="page">
+
+  <div class="title">
+    <div>
+      <h2>Dashboard</h2>
+      <p>Live overview of employees and their documents.</p>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert error">
+      {{ error() }}
+    </div>
+  }
+
+  @if (!summary()) {
+
+    <div class="loading">
+      Loading dashboard…
+    </div>
+
+  } @else {
+
+    <div class="cards">
+
+      <article class="card">
+        <span>Total employees</span>
+        <strong>
+          {{ summary()!.totalEmployees }}
+        </strong>
+      </article>
+
+      <article class="card">
+        <span>Active employees</span>
+        <strong>
+          {{ summary()!.activeEmployees }}
+        </strong>
+      </article>
+
+      <article class="card">
+        <span>Inactive employees</span>
+        <strong>
+          {{ summary()!.inactiveEmployees }}
+        </strong>
+      </article>
+
+      <article class="card">
+        <span>Total documents</span>
+        <strong>
+          {{ summary()!.totalDocuments }}
+        </strong>
+      </article>
+
+      <article class="card">
+        <span>Uploaded this month</span>
+        <strong>
+          {{ summary()!.documentsThisMonth }}
+        </strong>
+      </article>
+
+    </div>
+
+    <div class="grid two">
+
+      <!-- Employees by Department -->
+
+      <article class="panel">
+
+        <h3>Employees by department</h3>
+
+        <p class="hint">
+          Java
+          <code>HashMap&lt;String,Integer&gt;</code>
+          becomes a JSON object, then Angular's
+          <code>Record&lt;string,number&gt;</code>.
+        </p>
+
+        @for (item of departments() | keyvalue; track item.key) {
+
+          <div class="barrow">
+
+            <span>
+              {{ item.key }}
+            </span>
+
+            <b>
+              {{ item.value }}
+            </b>
+
+            <i
+              [style.width.%]="item.value * 20">
+            </i>
+
+          </div>
+
+        }
+
+      </article>
+
+
+      <!-- Recent Employees -->
+
+      <article class="panel">
+
+        <h3>Recent employees</h3>
+
+        <table>
+
+          <tbody>
+
+            @for (e of recentEmployees(); track e.id) {
+
+              <tr>
+
+                <td>
+                  <b>
+                    {{ e.firstName }} {{ e.lastName }}
+                  </b>
+
+                  <br>
+
+                  <small>
+                    {{ e.employeeCode }}
+                  </small>
+                </td>
+
+                <td>
+                  {{ e.departmentName || e.department?.name || e.department }}
+                </td>
+
+                <td>
+                  <span class="badge">
+                    {{ e.status }}
+                  </span>
+                </td>
+
+              </tr>
+
+            } @empty {
+
+              <tr>
+                <td>
+                  No recent employees.
+                </td>
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </article>
+
+
+      <!-- Recent Documents -->
+
+      <article class="panel">
+
+        <h3>Recent uploaded documents</h3>
+
+        <table>
+
+          <tbody>
+
+            @for (d of recentDocuments(); track d.originalFileName || d.fileName || $index) {
+
+              <tr>
+
+                <td>
+                  <b>
+                    {{ d.originalFileName || d.fileName }}
+                  </b>
+
+                  <br>
+
+                  <small>
+                    {{ d.fileType }}
+                  </small>
+                </td>
+
+                <td>
+                  {{ d.fileSize | number }} bytes
+                </td>
+
+                <td>
+                  @if (d.documentType) {
+                    <span class="badge">
+                      {{ d.documentType }}
+                    </span>
+                  }
+                  @if (d.uploadedAt) {
+                    <br>
+                    <small>
+                      {{ d.uploadedAt | date:'mediumDate' }}
+                    </small>
+                  }
+                </td>
+
+              </tr>
+
+            } @empty {
+
+              <tr>
+                <td colspan="3">
+                  No documents yet.
+                </td>
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </article>
+
+    </div>
+
+  }
+
+</section>

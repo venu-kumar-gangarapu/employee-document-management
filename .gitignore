@@ -1,0 +1,47 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node dependencies
+/node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Angular build cache
+/.angular/cache
+
+# IDEs and Editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and runtime artifacts
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Test coverage
+/coverage
+

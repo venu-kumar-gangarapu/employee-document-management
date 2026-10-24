@@ -1,0 +1,75 @@
+<section class="page">
+    <a routerLink="/employees">← Back to employees</a>
+
+    @if (!employee() && !error()) {
+        <div class="loading">Loading employee…</div>
+    }
+
+    @if (error()) {
+        <div class="alert error">{{ error() }}</div>
+    }
+
+    @if (employee(); as e) {
+        <div class="title">
+            <div>
+                <h2>{{ e.firstName }} {{ e.lastName }}</h2>
+                <p>{{ e.employeeCode }} · {{ e.designation || 'No designation' }}</p>
+            </div>
+            <span class="badge">{{ e.status }}</span>
+        </div>
+
+        <div class="grid two">
+            <article class="panel">
+                <h3>Employee information</h3>
+                <dl>
+                    <dt>Email</dt>
+                    <dd>{{ e.email }}</dd>
+                    <dt>Phone</dt>
+                    <dd>{{ e.phone || 'Not supplied' }}</dd>
+                    <dt>Department</dt>
+                    <dd>{{ e.departmentName || $any(e.department)?.name || e.department || 'Unassigned' }}</dd>
+                    <dt>Manager</dt>
+                    <dd>{{ $any(e.manager)?.name || e.manager || 'No manager' }}</dd>
+                    <dt>Joining date</dt>
+                    <dd>{{ e.joiningDate | date:'longDate' }}</dd>
+                    <dt>Salary</dt>
+                    <dd>{{ e.salary ? (e.salary | currency:'INR':'symbol':'1.0-0') : 'Not supplied' }}</dd>
+                </dl>
+            </article>
+
+            <article class="panel">
+                <h3>Skills</h3>
+                <div class="chips">
+                    @for (skill of e.skills || []; track $index) {
+                        <span>{{ skill }}</span>
+                    } @empty {
+                        <p class="empty">No skills recorded.</p>
+                    }
+                </div>
+
+                <h3>Documents</h3>
+                <ul class="plain">
+                    @for (d of e.documents || []; track d.id || $index) {
+                        <li>{{ d.fileName }} — {{ d.status }}</li>
+                    } @empty {
+                        <li class="empty">No related documents returned.</li>
+                    }
+                </ul>
+            </article>
+
+            <article class="panel">
+                <h3>Recent activity</h3>
+                <ul class="plain">
+                    @for (a of e.recentActivities || []; track a.id || $index) {
+                        <li>
+                            <b>{{ a.description }}</b><br>
+                            <small>{{ a.occurredAt | date:'medium' }}</small>
+                        </li>
+                    } @empty {
+                        <li class="empty">No recent activity.</li>
+                    }
+                </ul>
+            </article>
+        </div>
+    }
+</section>

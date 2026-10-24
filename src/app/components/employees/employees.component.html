@@ -1,0 +1,138 @@
+<section class="page">
+    <div class="title">
+        <div>
+            <h2>Employee management</h2>
+            <p>Search, filter, maintain, and open employee records.</p>
+        </div>
+        <button class="primary" (click)="open()">+ Add employee</button>
+    </div>
+
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load(0)">
+        <input placeholder="Search name or code" formControlName="keyword">
+        <select formControlName="departmentName">
+            <option value="">All departments</option>
+            <option value="New Department">New Department</option>
+            <option value="New">New</option>
+            <option value="Departmentsssss">Departmentsssss</option>
+            <option value="Engineering">Engineering</option>
+            <option value="HR">HR</option>
+            <option value="Finance">Finance</option>
+            <option value="Sales">Sales</option>
+        </select>
+        <select formControlName="status">
+            <option value="">All statuses</option>
+            <option>ACTIVE</option>
+            <option>INACTIVE</option>
+        </select>
+        <select formControlName="sort">
+            <option value="firstName,asc">Name A–Z</option>
+            <option value="firstName,desc">Name Z–A</option>
+        </select>
+        <button type="submit">Apply</button>
+    </form>
+
+    @if (message()) {
+        <div class="alert" [class.error]="error()">{{ message() }}</div>
+    }
+
+    @if (loading()) {
+        <div class="loading">Loading employees…</div>
+    } @else {
+        <article class="panel tablewrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Department Name</th>
+                        <th>Designation</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (e of page().content; track e.id) {
+                        <tr>
+                            <td>
+                                <b>{{ e.firstName }} {{ e.lastName }}</b><br>
+                                <small>{{ e.employeeCode }} · {{ e.email }}@if (e.phone) { · {{ e.phone }}}</small>
+                            </td>
+                            <td>{{ e.departmentName || $any(e.department)?.name || e.department || '—' }}</td>
+                            <td>{{ e.designation || '—' }}</td>
+                            <td>
+                                <span class="badge" [class.inactive]="e.status === 'INACTIVE'">{{ e.status }}</span>
+                            </td>
+                            <td class="actions">
+                                <a [routerLink]="['/employees', e.id]">View</a>
+                                <button type="button" (click)="open(e)">Edit</button>
+                                <button type="button" class="danger" (click)="remove(e)">Delete</button>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td colspan="5" class="empty">No employees matched your filters.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </article>
+
+        <div class="pagination">
+            <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+                <label for="pageSize" style="margin: 0; color: var(--muted); font-size: 13px;">Rows per page:</label>
+                <select id="pageSize" style="width: auto; padding: 6px 10px;" [value]="pageSize()" (change)="onPageSizeChange($event)">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                </select>
+            </div>
+            <span>Showing {{ page().content.length }} of {{ page().totalElements }} employees</span>
+            <button type="button" [disabled]="page().page === 0" (click)="load(page().page - 1)">Previous</button>
+            <span>Page {{ page().page + 1 }} / {{ page().totalPages || 1 }}</span>
+            <button type="button" [disabled]="page().page + 1 >= page().totalPages" (click)="load(page().page + 1)">Next</button>
+        </div>
+    }
+
+    @if (showForm()) {
+        <div class="modal">
+            <form class="dialog" [formGroup]="form" (ngSubmit)="save()">
+                <h3>{{ editing() ? 'Edit' : 'Add' }} employee</h3>
+                <div class="formgrid">
+                    <label>Code
+                        <input formControlName="employeeCode">
+                    </label>
+                    <label>First name
+                        <input formControlName="firstName">
+                    </label>
+                    <label>Last name
+                        <input formControlName="lastName">
+                    </label>
+                    <label>Email
+                        <input formControlName="email">
+                    </label>
+                    <label>Department
+                        <input formControlName="departmentName">
+                    </label>
+                    <label>Designation
+                        <input formControlName="designation">
+                    </label>
+                    <label>Status
+                        <select formControlName="status">
+                            <option>ACTIVE</option>
+                            <option>INACTIVE</option>
+                        </select>
+                    </label>
+                    <label>Salary
+                        <input type="number" formControlName="salary">
+                    </label>
+                </div>
+                <p class="hint">Required: code, first name, last name and a valid email.</p>
+                <div class="actions">
+                    <button type="button" (click)="showForm.set(false)">Cancel</button>
+                    <button class="primary" type="submit" [disabled]="form.invalid">Save</button>
+                </div>
+            </form>
+        </div>
+    }
+</section>
+

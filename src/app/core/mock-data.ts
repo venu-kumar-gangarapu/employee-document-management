@@ -1,0 +1,8 @@
+import { Employee, DocumentRecord } from '../models/employee.model';
+export const employees: Employee[]=[
+{id:1,employeeCode:'EMP001',firstName:'John',lastName:'Smith',email:'john@example.com',phone:'+91 98765 10001',department:{id:10,name:'Engineering'},designation:'Senior Developer',salary:95000,joiningDate:'2023-04-18',status:'ACTIVE',manager:{id:5,name:'David Miller'},skills:['Java','Spring Boot','Angular'],documents:[],recentActivities:[{description:'Profile updated',occurredAt:'2026-10-01T09:30:00'}]},
+{id:2,employeeCode:'EMP002',firstName:'Priya',lastName:'Sharma',email:'priya@example.com',phone:'+91 98765 10002',department:{id:11,name:'HR'},designation:'HR Manager',salary:78000,joiningDate:'2022-08-11',status:'ACTIVE',manager:{id:6,name:'Asha Rao'},skills:['Recruiting','Payroll'],documents:[],recentActivities:[]},
+{id:3,employeeCode:'EMP003',firstName:'Alex',lastName:'Chen',email:'alex@example.com',department:{id:12,name:'Finance'},designation:'Financial Analyst',salary:82000,joiningDate:'2024-01-05',status:'ACTIVE',manager:null,skills:['Excel','Forecasting'],documents:[],recentActivities:[]},
+{id:4,employeeCode:'EMP004',firstName:'Maria',lastName:'Garcia',email:'maria@example.com',department:{id:13,name:'Sales'},designation:'Account Executive',salary:70000,joiningDate:'2021-11-20',status:'INACTIVE',manager:{id:7,name:'Rob King'},skills:null,documents:[],recentActivities:[]}
+];
+export const documents: DocumentRecord[]=[{id:101,fileName:'john-resume.pdf',fileType:'application/pdf',fileSize:245678,uploadedAt:'2026-10-02T10:30:00',status:'UPLOADED',employeeId:1,documentType:'RESUME'},{id:102,fileName:'priya-id.png',fileType:'image/png',fileSize:121900,uploadedAt:'2026-10-01T11:15:00',status:'UPLOADED',employeeId:2,documentType:'ID_PROOF'}];
