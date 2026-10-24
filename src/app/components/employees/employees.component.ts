@@ -106,7 +106,7 @@ import {
             ...v,
             departmentName: v.departmentName,
             department: v.departmentName ? {
-                name: v.departmentName
+                id: v.departmentName
             } : null
         };
         const done = () => {

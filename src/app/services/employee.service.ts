@@ -107,7 +107,7 @@ export class EmployeeService extends ApiService {
       employees.push(e);
       return of(e);
     }
-    return this.http.post<Employee>(`${this.base}/employees`, e);
+    return this.http.post<Employee>(`${this.base}/employee`, e);
   }
   update(id: number, e: Employee) {
     if (this.mock) {
