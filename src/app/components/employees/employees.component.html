@@ -134,5 +134,19 @@
             </form>
         </div>
     }
+
+    @if (employeeToDelete(); as emp) {
+        <div class="modal">
+            <div class="dialog" style="max-width: 480px;">
+                <h3>Confirm Delete</h3>
+                <p>Are you sure you want to delete <b>{{ emp.firstName }} {{ emp.lastName }}</b> ({{ emp.employeeCode }})?</p>
+                <p class="hint">This action cannot be undone.</p>
+                <div class="actions" style="justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" (click)="cancelRemove()">Cancel</button>
+                    <button type="button" class="danger" (click)="confirmRemove()">OK</button>
+                </div>
+            </div>
+        </div>
+    }
 </section>
 

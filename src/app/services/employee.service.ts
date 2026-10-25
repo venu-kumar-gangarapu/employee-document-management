@@ -115,7 +115,7 @@ export class EmployeeService extends ApiService {
       employees[i] = { ...e, id };
       return of(employees[i]);
     }
-    return this.http.put<Employee>(`${this.base}/employees/${id}`, e);
+    return this.http.put<Employee>(`${this.base}/employee/${id}`, e);
   }
   delete(id: number) {
     if (this.mock) {
@@ -123,6 +123,6 @@ export class EmployeeService extends ApiService {
       if (i >= 0) employees.splice(i, 1);
       return of(void 0);
     }
-    return this.http.delete<void>(`${this.base}/employees/${id}`);
+    return this.http.delete<void>(`${this.base}/employee/${id}`);
   }
 }

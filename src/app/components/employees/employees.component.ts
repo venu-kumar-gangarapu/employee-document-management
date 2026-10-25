@@ -30,6 +30,7 @@ import {
     error = signal(false);
     showForm = signal(false);
     editing = signal<Employee | null>(null);
+    employeeToDelete = signal<Employee | null>(null);
     pageSize = signal<number>(10);
     page = signal<PageResponse<Employee>>({
         content: [],
@@ -106,7 +107,7 @@ import {
             ...v,
             departmentName: v.departmentName,
             department: v.departmentName ? {
-                id: v.departmentName
+                id: 1
             } : null
         };
         const done = () => {
@@ -124,15 +125,28 @@ import {
         });
     }
     remove(e: Employee) {
-        if (confirm(`Delete ${e.firstName} ${e.lastName}?`)) this.s.delete(e.id!).subscribe({
+        this.employeeToDelete.set(e);
+    }
+    confirmRemove() {
+        const e = this.employeeToDelete();
+        if (!e?.id) {
+            this.employeeToDelete.set(null);
+            return;
+        }
+        this.s.delete(e.id).subscribe({
             next: () => {
                 this.message.set('Employee deleted.');
+                this.employeeToDelete.set(null);
                 this.load(this.page().page);
             },
             error: x => {
                 this.message.set(this.s.errorMessage(x));
                 this.error.set(true);
+                this.employeeToDelete.set(null);
             }
         });
+    }
+    cancelRemove() {
+        this.employeeToDelete.set(null);
     }
 }
