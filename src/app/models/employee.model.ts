@@ -1,5 +1,11 @@
 export type EmployeeStatus = 'ACTIVE'|'INACTIVE';
-export interface Department { id?: number; name: string; }
+export interface Department {
+  id?: number;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 export interface Manager { id?: number; name: string; }
 export interface DocumentRecord { id:number; fileName:string; fileType:string; fileSize:number; uploadedAt:string; status:string; employeeId?:number; documentType?:string; }
 export interface Activity { id?:number; description:string; occurredAt:string; }

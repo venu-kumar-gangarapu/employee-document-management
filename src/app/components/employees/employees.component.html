@@ -111,7 +111,21 @@
                         <input formControlName="email">
                     </label>
                     <label>Department
-                        <input formControlName="departmentName">
+                        <input formControlName="departmentName" placeholder="e.g. Dept">
+                        @if (departmentLoading()) {
+                            <small class="hint" style="display: block; margin-top: 4px; color: var(--muted);">Searching department…</small>
+                        } @else if (selectedDepartment()) {
+                            <small class="hint" style="display: block; margin-top: 4px; color: #166534;">
+                                ✓ ID: {{ selectedDepartment()!.id }} · {{ selectedDepartment()!.name }}
+                                @if (selectedDepartment()!.description) {
+                                    ({{ selectedDepartment()!.description }})
+                                }
+                            </small>
+                        } @else if (form.get('departmentName')?.value) {
+                            <small class="hint" style="display: block; margin-top: 4px; color: #b45309;">
+                                ⚠ Department not found
+                            </small>
+                        }
                     </label>
                     <label>Designation
                         <input formControlName="designation">
@@ -128,7 +142,7 @@
                 </div>
                 <p class="hint">Required: code, first name, last name and a valid email.</p>
                 <div class="actions">
-                    <button type="button" (click)="showForm.set(false)">Cancel</button>
+                    <button type="button" (click)="closeForm()">Cancel</button>
                     <button class="primary" type="submit" [disabled]="form.invalid">Save</button>
                 </div>
             </form>

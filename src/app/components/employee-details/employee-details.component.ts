@@ -24,12 +24,12 @@ import {
 }) export class EmployeeDetailsComponent {
     private route = inject(ActivatedRoute);
     private s = inject(EmployeeService);
-    employee = signal < Employee | null > (null);
+    employee = signal < any | null > (null);
     error = signal('');
     constructor() {
         const id = Number(this.route.snapshot.paramMap.get('id'));
         this.s.get(id).subscribe({
-            next: x => this.employee.set(x),
+            next: (x:any) => this.employee.set(x.data),
             error: e => this.error.set(this.s.errorMessage(e))
         })
     }

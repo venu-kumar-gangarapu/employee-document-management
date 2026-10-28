@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Observable, of, throwError, map } from "rxjs";
-import { Employee, PageResponse } from "../models/employee.model";
+import { Observable, of, throwError, map, catchError } from "rxjs";
+import { Employee, PageResponse, Department } from "../models/employee.model";
 import { ApiService } from "./api.service";
 import { employees } from "../core/mock-data";
 @Injectable({ providedIn: "root" })
@@ -99,7 +99,7 @@ export class EmployeeService extends ApiService {
   get(id: number) {
     return this.mock
       ? of(employees.find((e) => e.id === id)!)
-      : this.http.get<Employee>(`${this.base}/employees/${id}`);
+      : this.http.get<Employee>(`${this.base}/employee/${id}`);
   }
   create(e: Employee) {
     if (this.mock) {
@@ -124,5 +124,30 @@ export class EmployeeService extends ApiService {
       return of(void 0);
     }
     return this.http.delete<void>(`${this.base}/employee/${id}`);
+  }
+  getDepartmentByName(name: string): Observable<Department | null> {
+    if (this.mock) {
+      return of({
+        id: 4,
+        name: name,
+        description: "Civil Engineering",
+        created_at: "2026-10-03T20:48:29",
+        updated_at: "2026-10-04T20:35:05",
+      });
+    }
+    return this.http
+      .get<any>(`${this.base}/department`, {
+        params: { name },
+      })
+      .pipe(
+        map((res: any): Department | null => {
+          const data = res?.data !== undefined ? res.data : res;
+          if (Array.isArray(data)) {
+            return data.length > 0 ? data[0] : null;
+          }
+          return data || null;
+        }),
+        catchError(() => of(null)),
+      );
   }
 }

@@ -13,11 +13,18 @@ import {
 } from '@angular/forms';
 import {
     Employee,
-    PageResponse
+    PageResponse,
+    Department
 } from '../../models/employee.model';
 import {
     EmployeeService
 } from '../../services/employee.service';
+import {
+    debounceTime,
+    distinctUntilChanged,
+    switchMap,
+    of
+} from 'rxjs';
 @Component({
     standalone: true,
     imports: [RouterLink, ReactiveFormsModule],
@@ -31,6 +38,8 @@ import {
     showForm = signal(false);
     editing = signal<Employee | null>(null);
     employeeToDelete = signal<Employee | null>(null);
+    selectedDepartment = signal<Department | null>(null);
+    departmentLoading = signal(false);
     pageSize = signal<number>(10);
     page = signal<PageResponse<Employee>>({
         content: [],
@@ -57,6 +66,23 @@ import {
     });
     constructor() {
         this.load(0);
+        this.form.get('departmentName')?.valueChanges.pipe(
+            debounceTime(400),
+            distinctUntilChanged(),
+            switchMap(name => {
+                const trimmed = (name || '').trim();
+                if (!trimmed) {
+                    this.selectedDepartment.set(null);
+                    this.departmentLoading.set(false);
+                    return of(null);
+                }
+                this.departmentLoading.set(true);
+                return this.s.getDepartmentByName(trimmed);
+            })
+        ).subscribe(dept => {
+            this.selectedDepartment.set(dept);
+            this.departmentLoading.set(false);
+        });
     }
     load(n: number) {
         this.loading.set(true);
@@ -87,31 +113,43 @@ import {
     }
     open(e?: Employee) {
         this.editing.set(e || null);
+        const deptName = e?.departmentName || (typeof e?.department === 'string' ? e.department : e?.department?.name || '');
+        const deptId = typeof e?.department === 'object' && e?.department?.id ? e.department.id : undefined;
+        this.selectedDepartment.set(deptId ? { id: deptId, name: deptName } : null);
+        this.departmentLoading.set(false);
         this.form.reset({
             employeeCode: e?.employeeCode || '',
             firstName: e?.firstName || '',
             lastName: e?.lastName || '',
             email: e?.email || '',
-            departmentName: e?.departmentName || (typeof e?.department === 'string' ? e.department : e?.department?.name || ''),
+            departmentName: deptName,
             designation: e?.designation || '',
             status: e?.status || 'ACTIVE',
             salary: e?.salary || 0
-        });
+        }, { emitEvent: false });
         this.showForm.set(true);
+    }
+    closeForm() {
+        this.showForm.set(false);
+        this.selectedDepartment.set(null);
+        this.departmentLoading.set(false);
     }
     save() {
         const v = this.form.getRawValue();
         const old = this.editing();
+        const dept = this.selectedDepartment();
+        const deptId = dept?.id ?? (typeof old?.department === 'object' && old?.department?.id ? old.department.id : null);
         const model: any = {
             ...old,
             ...v,
             departmentName: v.departmentName,
-            department: v.departmentName ? {
-                id: 1
-            } : null
+            department: deptId ? {
+                id: deptId,
+                name: dept?.name || v.departmentName
+            } : (v.departmentName ? { id: deptId, name: v.departmentName } : null)
         };
         const done = () => {
-            this.showForm.set(false);
+            this.closeForm();
             this.message.set('Employee saved successfully.');
             this.error.set(false);
             this.load(this.page().page);
