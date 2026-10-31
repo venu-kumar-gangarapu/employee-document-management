@@ -1,0 +1,148 @@
+<section class="page">
+    <div class="title">
+        <div>
+            <h2>Document / file management</h2>
+            <p>Upload PDF, Excel, Word and image files with employee metadata.</p>
+        </div>
+    </div>
+
+    @if (message()) {
+        <div class="alert" [class.error]="failed()">{{ message() }}</div>
+    }
+
+    <div class="grid two">
+        <!-- Upload Form -->
+        <form class="panel" (ngSubmit)="upload()">
+            <h3>Upload documents</h3>
+
+            <label>Employee ID
+                <input type="number" [(ngModel)]="employeeId" name="employeeId" required min="1">
+            </label>
+
+            <label>Document type
+                <select [(ngModel)]="documentType" name="type">
+                    <option value="RESUME">RESUME</option>
+                    <option value="ID_PROOF">ID_PROOF</option>
+                    <option value="CONTRACT">CONTRACT</option>
+                    <option value="CERTIFICATE">CERTIFICATE</option>
+                    <option value="PAYSLIP">PAYSLIP</option>
+                    <option value="OTHER">OTHER</option>
+                </select>
+            </label>
+
+            <label class="file">Choose one or more files
+                <input type="file" multiple accept=".pdf,.xlsx,.xls,.doc,.docx,image/*" (change)="choose($event)">
+            </label>
+            <p class="hint">Selected: {{ files.length }}. Files are sent as <code>multipart/form-data</code>.</p>
+
+            @if (progress() >= 0) {
+                <div class="progress">
+                    <i [style.width.%]="progress()"></i>
+                </div>
+                <p>{{ progress() }}%</p>
+            }
+
+            <button class="primary" type="submit" [disabled]="!files.length">Upload</button>
+        </form>
+
+        <!-- Filters -->
+        <article class="panel">
+            <h3>Filters</h3>
+            <label>Employee ID
+                <input type="number" [(ngModel)]="filterEmployee" name="filterEmployee" placeholder="e.g. 1">
+            </label>
+            <label>Document type
+                <select [(ngModel)]="filterType" name="filterType">
+                    <option value="">All document types</option>
+                    <option value="RESUME">RESUME</option>
+                    <option value="ID_PROOF">ID_PROOF</option>
+                    <option value="CONTRACT">CONTRACT</option>
+                    <option value="CERTIFICATE">CERTIFICATE</option>
+                    <option value="PAYSLIP">PAYSLIP</option>
+                    <option value="OTHER">OTHER</option>
+                </select>
+            </label>
+            <div class="actions" style="margin-top: 15px;">
+                <button type="button" (click)="resetFilters()">Clear filters</button>
+            </div>
+            <p class="hint">Filter uploaded documents by employee ID or document classification.</p>
+        </article>
+    </div>
+
+    <!-- Document List Table -->
+    <article class="panel tablewrap" style="margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3>Uploaded files ({{ filtered().length }})</h3>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Employee ID</th>
+                    <th>Document Type</th>
+                    <th>Status</th>
+                    <th>Uploaded Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (d of filtered(); track d.id) {
+                    <tr>
+                        <td>
+                            <b>{{ d.originalFileName || d.fileName }}</b>
+                            <br>
+                            <small>{{ d.fileType }} · {{ d.fileSize | number }} bytes</small>
+                            @if (d.storedFileName && d.storedFileName !== (d.originalFileName || d.fileName)) {
+                                <br>
+                                <small class="hint">{{ d.storedFileName }}</small>
+                            }
+                        </td>
+                        <td>
+                            @if (d.employeeId) {
+                                <b>EMP #{{ d.employeeId }}</b>
+                            } @else {
+                                <span class="hint">—</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge">{{ d.documentType || '—' }}</span>
+                        </td>
+                        <td>
+                            <span class="badge" [class.inactive]="d.status === 'DELETED' || d.status === 'FAILED'">
+                                {{ d.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ d.uploadedAt | date:'medium' }}
+                        </td>
+                        <td class="actions">
+                            <button type="button" (click)="download(d)">Download</button>
+                            <button type="button" class="danger" (click)="remove(d)">Delete</button>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="6" class="empty">No documents found matching the filter criteria.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </article>
+
+    <!-- Delete Confirmation Modal -->
+    @if (documentToDelete(); as doc) {
+        <div class="modal">
+            <div class="dialog" style="max-width: 480px;">
+                <h3>Confirm Delete</h3>
+                <p>Are you sure you want to delete <b>{{ doc.originalFileName || doc.fileName }}</b>?</p>
+                <p class="hint">This action will delete the file record.</p>
+                <div class="actions" style="justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" (click)="cancelRemove()">Cancel</button>
+                    <button type="button" class="danger" (click)="confirmRemove()">OK</button>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+

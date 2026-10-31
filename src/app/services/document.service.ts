@@ -1,15 +1,35 @@
 import { Injectable } from "@angular/core";
 import { HttpEvent, HttpEventType } from "@angular/common/http";
-import { Observable, of, concat } from "rxjs";
+import { Observable, of, concat, map } from "rxjs";
 import { ApiService } from "./api.service";
 import { DocumentRecord } from "../models/employee.model";
 import { documents } from "../core/mock-data";
 @Injectable({ providedIn: "root" })
 export class DocumentService extends ApiService {
-  list() {
-    return this.mock
-      ? of([...documents])
-      : this.http.get<DocumentRecord[]>(`${this.base}/documents`);
+  list(): Observable<DocumentRecord[]> {
+    if (this.mock) {
+      return of([...documents]);
+    }
+    return this.http.get<any>(`${this.base}/documents`).pipe(
+      map((res: any): DocumentRecord[] => {
+        const list: any[] = Array.isArray(res) ? res : res?.data || [];
+        return list.map((d: any) => {
+          let inferredEmployeeId = d.employeeId;
+          if (inferredEmployeeId === undefined || inferredEmployeeId === null) {
+            const match = d.filePath ? d.filePath.match(/[/\\]employees[/\\](\d+)[/\\]/) : null;
+            if (match) {
+              inferredEmployeeId = Number(match[1]);
+            }
+          }
+          return {
+            ...d,
+            fileName: d.originalFileName || d.fileName || d.storedFileName || "Unnamed File",
+            originalFileName: d.originalFileName || d.fileName || d.storedFileName,
+            employeeId: inferredEmployeeId,
+          };
+        });
+      }),
+    );
   }
   upload(
     employeeId: number,
